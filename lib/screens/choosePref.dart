@@ -3,7 +3,6 @@ import 'package:darkjokes/services/prefs.dart';
 import 'package:flutter/material.dart';
 
 class ChoosePrefs extends StatefulWidget {
-  bool _isSelected = false;
   @override
   _ChoosePrefsState createState() => _ChoosePrefsState();
 }
@@ -11,12 +10,13 @@ class ChoosePrefs extends StatefulWidget {
 class _ChoosePrefsState extends State<ChoosePrefs> {
   bool allSel = true;
   bool cusSel = false;
+  bool noneSel = true;
   bool _visible = false;
-  double hei = 180;
+  double hei = 140;
   String categString;
-  String filter = '';
+  String filtString = '';
   TextStyle choStyle= TextStyle(fontSize: 27, fontFamily: 'Montserrat', fontWeight: FontWeight.w600, color: Colors.white);
-  TextStyle filtStyle= TextStyle(fontSize: 15, fontFamily: 'Montserrat', fontWeight: FontWeight.w600, color: Colors.white);
+  TextStyle filtStyle= TextStyle(fontSize: 16, fontFamily: 'Montserrat', fontWeight: FontWeight.w600, color: Colors.white);
   void apppearTime(bool selected){
     int timel=0;
     if(selected==false){
@@ -32,30 +32,57 @@ class _ChoosePrefsState extends State<ChoosePrefs> {
     });
     }
   }
+
   final List<Categories> _categsList = <Categories>[
     const Categories('Dark'),
     const Categories('Programming'),
     const Categories('Miscellaneous'),
   ];
-  List<String> _chips = <String>[];
+
+  List<String> _cchips = <String>[];
   setCategString(){
     setState(() {
-      categString=_chips.join(',');
+      if(allSel){
+        categString = 'Any';
+      }
+      else{
+        categString=_cchips.join(',');
+      }
     });
     print(categString);
+  }
+  final List<Blacklists> _filtList = <Blacklists>[
+    const Blacklists('NSFW'),
+    const Blacklists('Sexist'),    
+    const Blacklists('Racist'),
+    const Blacklists('Religious'),
+    const Blacklists('Political'),
+  ];
+  List<String> _fchips = <String>[];
+  setFiltString(){
+    setState(() {
+      if(noneSel){
+        filtString = '';
+      }
+      else{
+        filtString='?blacklistFlags=' +_fchips.join(',');
+      }
+    });
+    print(filtString);
   }
   @override
   Widget build(BuildContext context) {
   var screenSize =  MediaQuery.of(context).size;
     return Scaffold(
           body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.center,
-              colors: [Color(0xfff1F0D44), Color(0xfff020815)]
+            height: screenSize.height,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.center,
+                colors: [Color(0xfff1F0D44), Color.fromRGBO(7, 24, 45, 1.0)]
+              ),
             ),
-          ),
           child: Column(
             children: [
               SafeArea(
@@ -85,7 +112,7 @@ class _ChoosePrefsState extends State<ChoosePrefs> {
                       ),
                       child: Text('Types Of Jokes', style: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w600, color: Color.fromRGBO(10, 24, 48, 1.0), fontSize: 30),)
                     ),
-                    Padding(padding: const EdgeInsets.only(top:20)),  
+                    Padding(padding: const EdgeInsets.only(top:10)),  
                     Wrap(
                       spacing: 20.0,
                       children: [
@@ -100,11 +127,15 @@ class _ChoosePrefsState extends State<ChoosePrefs> {
                           onSelected: (bool selected) {
                             setState(() {
                               allSel=selected;
-                              categString='Any';
-                              if(cusSel = true){
+                              for(Categories los in _categsList){
+                                _cchips.removeWhere((String delete){
+                                  return delete == los.categs;
+                                });
+                              }
+                              if(cusSel){
                                 cusSel= false;
                                 _visible= false;
-                                hei = 153;
+                                hei = 140;
                               }
                             });
                           },
@@ -120,11 +151,16 @@ class _ChoosePrefsState extends State<ChoosePrefs> {
                           selected: cusSel,     
                           onSelected: (bool selected) {
                             setState(() {
-                              hei = 230;
+                              hei = 220;
                               cusSel=selected;
                               if(cusSel==false){
-                                hei=153;
+                                hei=140;
+                                for(Categories los in _categsList){
+                                _cchips.removeWhere((String delete){
+                                  return delete == los.categs;
+                                });
                               }
+                            }
                               allSel=!selected;
                               apppearTime(selected);
                             });
@@ -139,11 +175,11 @@ class _ChoosePrefsState extends State<ChoosePrefs> {
                       color: Colors.black,
                       )*/
                     AnimatedOpacity(
-                      duration: Duration(milliseconds: 800),
+                      duration: Duration(milliseconds: 500),
                       opacity: _visible? 1.0:0.0,
                       child: _visible ? 
                       Wrap(
-                        spacing: 5,
+                        spacing: 9,
                         children: categChips.toList(),
                       ) : Text(''),
                     ),
@@ -153,7 +189,7 @@ class _ChoosePrefsState extends State<ChoosePrefs> {
               Padding(padding: const EdgeInsets.only(top: 20)),
               Container(
                 padding: const EdgeInsets.only(left: 20, top: 20),
-                height: 250,
+                height: 215,
                 width: screenSize.width/1.07,
                 decoration: BoxDecoration(
                   color: Color(0xfff0099FF),
@@ -170,12 +206,71 @@ class _ChoosePrefsState extends State<ChoosePrefs> {
                       ),
                       child: Text('Filters', style: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w600, color: Color.fromRGBO(10, 24, 48, 1.0), fontSize: 30),)
                     ),
+                    Padding(padding: const EdgeInsets.only(top:5),),
+                    ChoiceChip(
+                      label: Text('None'), 
+                      backgroundColor: Color.fromRGBO(0, 163, 255, 1.0),
+                      elevation: 15.0,
+                      pressElevation: 0.0,
+                      shadowColor: Colors.black,
+                      labelStyle: choStyle,
+                      selected: noneSel,     
+                      onSelected: (bool selected) {
+                        setState(() {
+                          noneSel=selected;
+                          if(noneSel==true){
+                            for(Blacklists polos in _filtList){
+                            _fchips.removeWhere((String delete){
+                              return delete == polos.filts;
+                            });
+                          }}
+                        });
+                      },
+                      selectedColor: Color.fromRGBO(24, 40, 80, 1.0),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 10.0),
+                      child: Wrap(
+                        spacing: 10.0,
+                        children: filtChips.toList(),
+                      ),
+                    )
                   ]
                 ),
               ),
               FloatingActionButton(
                 child: Icon(Icons.arrow_forward_ios),
-                onPressed: ()=> setCategString(),
+                onPressed: () {
+                  setCategString();
+                  setFiltString();
+                  if(categString=='' || filtString=='?blacklistFlags=' || filtString==null){
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context){
+                        return AlertDialog(
+                          title: Text('Warning!', style: TextStyle(fontFamily: 'Montserrat', color: Colors.amber, fontWeight: FontWeight.w600,)),
+                          content: Container(
+                            padding: const EdgeInsets.only(left: 5, right: 5),
+                            decoration: BoxDecoration(
+                              color: Colors.amber,
+                              borderRadius: BorderRadius.circular(6.0),
+                              border: Border.all(color: Color.fromRGBO(10, 24, 48, 1.0), width: 4.0,),
+                            ),
+                            child: Text('Please Select A Category or Just Select "All" and Leave Filters to "None"', style: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w600, color: Color.fromRGBO(10, 24, 48, 1.0), fontSize: 20),)
+                          ),
+                          actions: [
+                            FlatButton(
+                              child: Text('Close'),
+                              color: Color.fromRGBO(36, 58, 114, 1.0),
+                              onPressed: Navigator.of(context).pop,
+                            ),
+                          ],
+                          backgroundColor: Color.fromRGBO(0, 84, 161, 1.0),
+                        );
+                      }
+                    );
+                  }
+                }
               )
             ],
           ),
@@ -188,16 +283,18 @@ class _ChoosePrefsState extends State<ChoosePrefs> {
       yield FilterChip(
         label: Text(categ.categs),
         labelStyle: filtStyle,
-        backgroundColor: Color.fromRGBO(12, 66, 59, 1.0),
+        backgroundColor: Color.fromRGBO(0, 84, 161, 1.0),
         selectedColor: Color.fromRGBO(36, 58, 114, 1.0),
-        selected: _chips.contains(categ.categs),
+        checkmarkColor: Colors.white,
+        selected: _cchips.contains(categ.categs),
         onSelected: (bool selected){
           setState(() {
             if(selected){
-              _chips.add(categ.categs);
+              _cchips.add(categ.categs);
             }
+            
             else{
-              _chips.removeWhere((String delete) {
+              _cchips.removeWhere((String delete) {
                 return delete == categ.categs;
               });
             }
@@ -207,66 +304,39 @@ class _ChoosePrefsState extends State<ChoosePrefs> {
       );
     }
   }
-  
-  Widget filtersPrefs(){
-    return Wrap(
-        spacing: 10,
-        children: [
-          FilterChip(
-            backgroundColor: Color(0xff020815),
-            label: Text('NSFW'),
-            labelStyle: filtStyle,
-            selected: widget._isSelected,
-            onSelected: (bool selected) {
-              setState(() => widget._isSelected = selected);
+  Iterable<Widget> get filtChips sync*{
+    for(Blacklists filt in _filtList){
+      yield FilterChip(
+        label: Text(filt.filts), 
+        labelStyle: filtStyle,
+        backgroundColor: Color.fromRGBO(0, 84, 161, 1.0),
+        selectedColor: Color.fromRGBO(36, 58, 114, 1.0),
+        checkmarkColor: Colors.white,
+        selected: _fchips.contains(filt.filts),
+        onSelected: (bool selected){
+          setState(() {
+            noneSel=false;
+            if(selected){
+              _fchips.add(filt.filts);
             }
-          ),
-          FilterChip(
-            backgroundColor: Color(0xff020815),
-            label: Text('Religious'),
-            labelStyle: filtStyle,
-            selected: widget._isSelected,
-            onSelected: (bool selected) {
-              setState(()=> widget._isSelected = selected);
-                
-              },
-            ),
-            FilterChip(
-              backgroundColor: Color(0xff020815),
-              label: Text('Political'),
-              labelStyle: filtStyle,
-              selected: widget._isSelected,
-              onSelected: (bool selected) {
-                setState(()=> widget._isSelected = selected);
-                  
-              },
-            ),
-            FilterChip(
-              backgroundColor: Color(0xff020815),
-              label: Text('Sexist'),
-              labelStyle: filtStyle,
-              selected: widget._isSelected,
-              onSelected: (bool selected) {
-                setState(()=> widget._isSelected = selected);
-                  
-                },
-            ),
-            FilterChip(
-              backgroundColor: Color(0xff020815),
-              label: Text('Racist'),
-              labelStyle: filtStyle,
-              selected: widget._isSelected,
-              onSelected: (bool selected) {
-                setState(()=> widget._isSelected = selected);
-                  
-                },
-            ),
-          ]
-        );
+            else{
+              _fchips.removeWhere((String delete) {
+                return delete == filt.filts;
+              });
+            }
+          });
+        }
+      );
+    }
   }
 }
 
 class Categories{
   const Categories(this.categs);
   final String categs;
+}
+
+class Blacklists{
+  const Blacklists(this.filts);
+  final String filts;
 }
