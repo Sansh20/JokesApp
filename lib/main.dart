@@ -13,7 +13,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Preferences().checkPrefs(),
+      home: Preferences().showPrefs(),
     );
   }
 }
