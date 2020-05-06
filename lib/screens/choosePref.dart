@@ -12,11 +12,8 @@ class _ChoosePrefsState extends State<ChoosePrefs> {
   bool allSel = true;
   bool cusSel = false;
   bool _visible = false;
-  bool prog = false;
-  bool dark = false;
-  bool mis = false; 
   double hei = 180;
-  String categ = '';
+  String categString;
   String filter = '';
   TextStyle choStyle= TextStyle(fontSize: 27, fontFamily: 'Montserrat', fontWeight: FontWeight.w600, color: Colors.white);
   TextStyle filtStyle= TextStyle(fontSize: 15, fontFamily: 'Montserrat', fontWeight: FontWeight.w600, color: Colors.white);
@@ -35,39 +32,17 @@ class _ChoosePrefsState extends State<ChoosePrefs> {
     });
     }
   }
-  void setCateg(String choice){
+  final List<Categories> _categsList = <Categories>[
+    const Categories('Dark'),
+    const Categories('Programming'),
+    const Categories('Miscellaneous'),
+  ];
+  List<String> _chips = <String>[];
+  setCategString(){
     setState(() {
-      if(choice=='Any'){
-        dark=false;
-        mis=false;
-        prog=false;
-        categ=choice;
-        print(categ);
-      }
-      else{
-        if(categ.isEmpty || categ=='Any'){
-          categ = choice;
-          print(categ);
-        }
-        else if(categ.contains(','+choice)){
-          categ = categ.replaceAll(','+choice, '');
-          print(categ);
-        }
-        else if(categ.contains(choice)){
-          if(categ.contains(choice+',')) {
-            categ = categ.replaceAll(choice+',', '');
-          }
-          else{
-            categ = categ.replaceAll(choice, '');
-          }
-          print(categ);
-        }
-        else{
-          categ= categ + ',' +choice;
-          print(categ);
-        }
-      }
+      categString=_chips.join(',');
     });
+    print(categString);
   }
   @override
   Widget build(BuildContext context) {
@@ -125,7 +100,7 @@ class _ChoosePrefsState extends State<ChoosePrefs> {
                           onSelected: (bool selected) {
                             setState(() {
                               allSel=selected;
-                              setCateg('Any');
+                              categString='Any';
                               if(cusSel = true){
                                 cusSel= false;
                                 _visible= false;
@@ -145,7 +120,7 @@ class _ChoosePrefsState extends State<ChoosePrefs> {
                           selected: cusSel,     
                           onSelected: (bool selected) {
                             setState(() {
-                              hei = 250;
+                              hei = 230;
                               cusSel=selected;
                               if(cusSel==false){
                                 hei=153;
@@ -158,12 +133,19 @@ class _ChoosePrefsState extends State<ChoosePrefs> {
                         ),
                       ],
                     ),
-                    Padding(padding: const EdgeInsets.only(top:8)),
-                  
+                    Padding(padding: const EdgeInsets.only(top:3)),
+                    /*Divider(
+                      endIndent: 20.0,
+                      color: Colors.black,
+                      )*/
                     AnimatedOpacity(
                       duration: Duration(milliseconds: 800),
                       opacity: _visible? 1.0:0.0,
-                      child: categsPrefs(_visible),
+                      child: _visible ? 
+                      Wrap(
+                        spacing: 5,
+                        children: categChips.toList(),
+                      ) : Text(''),
                     ),
                   ]
                 ),
@@ -188,94 +170,44 @@ class _ChoosePrefsState extends State<ChoosePrefs> {
                       ),
                       child: Text('Filters', style: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w600, color: Color.fromRGBO(10, 24, 48, 1.0), fontSize: 30),)
                     ),
-                    Padding(padding: const EdgeInsets.only(top:20)),  
-                    Wrap(
-                      spacing: 20.0,
-                      children: [
-                        ChoiceChip(
-                          label: Text('None'), 
-                          backgroundColor: Color.fromRGBO(0, 163, 255, 1.0),
-                          elevation: 15.0,
-                          pressElevation: 0.0,
-                          shadowColor: Colors.black,
-                          labelStyle: choStyle,
-                          selected: allSel,     
-                          onSelected: (bool selected) {
-                            setState(() {
-                              allSel=selected;
-                              setCateg('Any');
-                            });
-                          },
-                          selectedColor: Color.fromRGBO(24, 40, 80, 1.0),
-                        ),
-                        
-                      ],
-                    ),
-                    Padding(padding: const EdgeInsets.only(top:8)),
-                  
-                    AnimatedOpacity(
-                      duration: Duration(milliseconds: 800),
-                      opacity: 1.0,
-                      child: filtersPrefs(),
-                    ),
                   ]
                 ),
               ),
               FloatingActionButton(
                 child: Icon(Icons.arrow_forward_ios),
-                onPressed: ()=> print('Pressed'),
+                onPressed: ()=> setCategString(),
               )
             ],
           ),
       ),
     );
   }
-  Widget categsPrefs(bool show){
-    if(show==true){
-      return
-        Wrap(
-          spacing: 10,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left:40.0),
-              child: FilterChip(
-                backgroundColor: Color(0xff020815),
-                label: Text('Dark'),
-                labelStyle: filtStyle,
-                selected: prog,
-                onSelected: (bool selected) {
-                  setState(() => prog = selected);
-                  setCateg('Dark');
-                }
-              ),
-            ),
-            FilterChip(
-              backgroundColor: Color(0xff020815),
-              label: Text('Programming'),
-              labelStyle: filtStyle,
-              selected: dark,
-              onSelected: (bool selected) {
-                setState(()=> dark = selected);
-                setCateg('Programming');
-                },
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left:50.0),
-                child: FilterChip(
-                  backgroundColor: Color(0xff020815),
-                  label: Text('Miscellaneous'),
-                  labelStyle: filtStyle,
-                  selected: mis,
-                  onSelected: (bool selected) {
-                    setState(()=> mis = selected);
-                    setCateg('Miscellaneous');
-                  },
-                ),
-              ),
-            ]
-          );
+
+  Iterable<Widget> get categChips sync*{
+    for(Categories categ in _categsList){
+      yield FilterChip(
+        label: Text(categ.categs),
+        labelStyle: filtStyle,
+        backgroundColor: Color.fromRGBO(12, 66, 59, 1.0),
+        selectedColor: Color.fromRGBO(36, 58, 114, 1.0),
+        selected: _chips.contains(categ.categs),
+        onSelected: (bool selected){
+          setState(() {
+            if(selected){
+              _chips.add(categ.categs);
+            }
+            else{
+              _chips.removeWhere((String delete) {
+                return delete == categ.categs;
+              });
+            }
+          });
+        },
+
+      );
     }
   }
+  
   Widget filtersPrefs(){
     return Wrap(
         spacing: 10,
@@ -332,4 +264,9 @@ class _ChoosePrefsState extends State<ChoosePrefs> {
           ]
         );
   }
+}
+
+class Categories{
+  const Categories(this.categs);
+  final String categs;
 }
