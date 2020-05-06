@@ -4,16 +4,15 @@ import 'package:darkjokes/screens/choosePref.dart';
 import 'package:darkjokes/screens/home.dart';
 
 class Preferences{
-  checkPrefs(){
-    return StreamBuilder(
-      stream: SharedPreferences.getInstance().asStream(),
-      builder: (BuildContext context, snapshot) {
-        if(snapshot.toString()==null){
-          return Home();
-        }
-        else{
-          return ChoosePrefs();
-        }});}
+  Widget checkPrefs(){
+    if(getCategs()!=null){
+      return Home();
+    }
+    else{
+       return ChoosePrefs();
+    }
+  }
+    
 
   setPrefs(String categ, String filter) async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
