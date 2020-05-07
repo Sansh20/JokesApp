@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:darkjokes/services/prefs.dart';
 import 'package:flutter/material.dart';
+import 'package:darkjokes/screens/home.dart';
 
 class ChoosePrefs extends StatefulWidget {
   @override
@@ -84,6 +85,7 @@ class _ChoosePrefsState extends State<ChoosePrefs> {
               ),
             ),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               SafeArea(
                 child: Container(
@@ -238,39 +240,71 @@ class _ChoosePrefsState extends State<ChoosePrefs> {
                   ]
                 ),
               ),
-              FloatingActionButton(
-                child: Icon(Icons.arrow_forward_ios),
-                onPressed: () {
-                  setCategString();
-                  setFiltString();
-                  if(categString=='' || filtString=='?blacklistFlags=' || filtString==null){
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context){
-                        return AlertDialog(
-                          title: Text('Warning!', style: TextStyle(fontFamily: 'Montserrat', color: Colors.amber, fontWeight: FontWeight.w600,)),
-                          content: Container(
-                            padding: const EdgeInsets.only(left: 5, right: 5),
-                            decoration: BoxDecoration(
-                              color: Colors.amber,
-                              borderRadius: BorderRadius.circular(6.0),
-                              border: Border.all(color: Color.fromRGBO(10, 24, 48, 1.0), width: 4.0,),
-                            ),
-                            child: Text('Please Select A Category or Just Select "All" and Leave Filters to "None"', style: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w600, color: Color.fromRGBO(10, 24, 48, 1.0), fontSize: 20),)
-                          ),
-                          actions: [
-                            FlatButton(
-                              child: Text('Close'),
-                              color: Color.fromRGBO(36, 58, 114, 1.0),
-                              onPressed: Navigator.of(context).pop,
-                            ),
-                          ],
-                          backgroundColor: Color.fromRGBO(0, 84, 161, 1.0),
-                        );
-                      }
-                    );
-                  }
-                }
+              
+              Expanded(
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Stack(
+                    alignment: Alignment(0.85, -0.75),
+                    children: [
+                      Image.asset('assets/vectors/waves.png'),
+                      FloatingActionButton(
+                        child: Icon(Icons.arrow_forward_ios),
+                        onPressed: () {
+                          setCategString();
+                          setFiltString();
+                          if(categString=='' || filtString=='?blacklistFlags=' || filtString==null){
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context){
+                                return AlertDialog(
+                                  title: Text('Warning!', style: TextStyle(fontFamily: 'Montserrat', color: Colors.amber, fontWeight: FontWeight.w600,)),
+                                  content: Container(
+                                    padding: const EdgeInsets.only(left: 5, right: 5),
+                                    decoration: BoxDecoration(
+                                      color: Colors.amber,
+                                      borderRadius: BorderRadius.circular(6.0),
+                                      border: Border.all(color: Color.fromRGBO(10, 24, 48, 1.0), width: 4.0,),
+                                    ),
+                                    child: Text('Please Select A Category or Just Select "All" and Leave Filters to "None"', style: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w600, color: Color.fromRGBO(10, 24, 48, 1.0), fontSize: 20),)
+                                  ),
+                                  actions: [
+                                    FlatButton(
+                                      child: Text('Close'),
+                                      color: Color.fromRGBO(36, 58, 114, 1.0),
+                                      onPressed: Navigator.of(context).pop,
+                                    ),
+                                  ],
+                                  backgroundColor: Color.fromRGBO(0, 84, 161, 1.0),
+                                );
+                              }
+                            );
+                          }
+                          else{
+                          Preferences().setPrefs(categString, filtString);
+                            Navigator.push(context, 
+                              PageRouteBuilder(
+                                transitionDuration: Duration(milliseconds: 200),
+                                transitionsBuilder: (BuildContext comtext, Animation<double> animation, Animation<double> secAnimation, Widget child) {
+                                  var begin = Offset(1.0, 0.0);
+                                  var end = Offset.zero;
+                                  var tween = Tween(begin: begin, end: end);
+                                  var offsetAnimation = animation.drive(tween);
+                                  return SlideTransition(
+                                    position: offsetAnimation,
+                                    child: child,
+                                  );
+                                },
+                                pageBuilder: (context, animation, secAnimation){
+                                  return Preferences().showPrefs();
+                                },
+                              ),
+                            );
+                          }
+                        }
+                      ),  
+             ]),
+                ),
               )
             ],
           ),
