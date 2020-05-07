@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:darkjokes/services/prefs.dart';
 import 'package:flutter/material.dart';
-import 'package:darkjokes/screens/home.dart';
 
 class ChoosePrefs extends StatefulWidget {
   @override
