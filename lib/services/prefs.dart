@@ -4,13 +4,15 @@ import 'package:darkjokes/screens/choosePref.dart';
 import 'package:darkjokes/screens/home.dart';
 
 class Preferences{
-  String categs, filts;
   Widget showPrefs(){
     return FutureBuilder(
       future: checkPrefs(),
       builder: (BuildContext context, snapshot){
         if(snapshot.data){
-          return Home();
+          return WillPopScope(
+            onWillPop: () async => false,
+            child: Home(),
+          );
         }
         else{
           return ChoosePrefs();
