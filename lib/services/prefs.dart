@@ -4,7 +4,7 @@ import 'package:darkjokes/screens/choosePref.dart';
 import 'package:darkjokes/screens/home.dart';
 
 class Preferences{
-  
+  String categs, filts;
   Widget showPrefs(){
     return FutureBuilder(
       future: checkPrefs(),
@@ -34,16 +34,6 @@ class Preferences{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('categs', categ);
     prefs.setString('filters', filter);
-  }
-  Future<String> getCategs() async{
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String categsFinal = prefs.getString('categs');
-    return categsFinal;
-  }
-  getFilts() async{
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String filters = prefs.getString('filters');
-    return filters;
   }
   resetPrefs() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
