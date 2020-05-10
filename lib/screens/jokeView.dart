@@ -9,28 +9,36 @@ class JokeView extends StatefulWidget {
 }
 
 class _JokeViewState extends State<JokeView> {
-  TextStyle textStyle = TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20.0);
-  Future<Joke> fetchJoke() async{
+  List<Joke> respList = [];
+  double i = 0;
+  TextStyle textStyle = TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 20.0);
+  Future<List> fetchJoke() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String categs = prefs.getString('categs');
     String filts = prefs.getString('filters');
-    final response= await http.get('https://sv443.net/jokeapi/v2/joke/$categs$filts');
-    print(categs);
-    print(filts);
-    print(response.body);
-    return Joke.fromJson(json.decode(response.body));
+    var responseObj;
+    for (int i=0; i<=5; i++) {
+      final response= await http.get('https://sv443.net/jokeapi/v2/joke/$categs$filts');
+      responseObj = Joke.fromJson(json.decode(response.body));
+      respList.add(responseObj);
+      print(responseObj);
+    }
+    return respList;
   }
+
   getFlagTags(bool showTag, String title){
     if(showTag){
       return AnimatedOpacity(
         duration: Duration(milliseconds: 200),
         opacity: 1.0,
         child: Container(
+          height: 20,
+          padding: const EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 0.0),
           decoration: BoxDecoration(
-            color: Color.fromRGBO(0, 163, 255, 0.75),
-            borderRadius: BorderRadius.circular(12),
+            color: Color.fromRGBO(7, 27, 55, 1.0),
+            borderRadius: BorderRadius.only(topRight: Radius.circular(8.0)),
           ),
-          child: Text(title, style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
+          child: Center(child: Text(title, style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold))),
         ),
       );
     }
@@ -38,65 +46,88 @@ class _JokeViewState extends State<JokeView> {
       return Text('');
     }
   }
+
+  void initState(){
+    super.initState();
+    fetchJoke();
+  }
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 250,
-      decoration: BoxDecoration(
-        color: Color(0xfff0099FF),
-        borderRadius: BorderRadius.circular(12.0),
+    return Center(
+      child: Stack(
+        children: jokes.toList(),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(5.0),
-        child: FutureBuilder(
-          future: fetchJoke(),
-          builder: (context, snapshot) {
-            if(snapshot.hasData){
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(snapshot.data.category+' #${snapshot.data.id}', style: textStyle,),
-                  snapshot.data.type=='single'? Center(
-                    child: Text(snapshot.data.joke, style: textStyle,)
-                    ): Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: Column(
-                      children: [
-                        Text(snapshot.data.setup, style: textStyle,),
-                        Text(snapshot.data.delivery, style: textStyle,),
-                      ]
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        getFlagTags(snapshot.data.flags.nsfw, 'NSFW'),
-                        getFlagTags(snapshot.data.flags.religious, 'Religious'),
-                        getFlagTags(snapshot.data.flags.political, 'Political'),
-                        getFlagTags(snapshot.data.flags.racist, 'Racist'),
-                        getFlagTags(snapshot.data.flags.sexist, 'Sexist'),
-                      ],
-                    ),
-                  )
-                ],
-              );
-            }
-            else{
-              return CircularProgressIndicator(
-                semanticsLabel: 'Please Wait',
-                backgroundColor: Colors.amber,
-              );
-            }
-            
-          }
-        ),
-      )
     );
   }
+  Iterable<Widget> get jokes sync*{
+    for(var u in respList){
+      yield Container(
+      width: 250,
+      height: 300,
+      //padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(color: Colors.black38,
+            blurRadius: 1.0, // soften the shadow
+            spreadRadius: 0.0, //extend the shadow
+            offset: Offset(3.0, 0),
+          )
+        ],
+        color: Color.fromRGBO(0, 60, 110, 1.0),
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      child: Column( 
+        mainAxisAlignment:MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisAlignment:MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(u.category+' #${u.id}', style: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w600, fontSize: 20, color: Colors.white),),
+                u.type=='single'? Padding(
+                  padding: const EdgeInsets.only(top:50.0),
+                  child: Text(u.joke, style: textStyle,),
+                ):Padding(
+                  padding: const EdgeInsets.only(top: 50), 
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(u.setup, style: textStyle),
+                      Padding(padding: const EdgeInsets.only(top:10)),
+                      Text(u.delivery, style: textStyle,),
+                    ]
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Align(
+              alignment: Alignment.bottomLeft,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  getFlagTags(u.flags.nsfw, 'NSFW'),
+                  getFlagTags(u.flags.religious, 'Religious'),
+                  getFlagTags(u.flags.political, 'Political'),
+                  getFlagTags(u.flags.racist, 'Racist'),
+                  getFlagTags(u.flags.sexist, 'Sexist'),
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+        );
+      i+=5;
+    }
+  }
 }
+
 class Flags{
   Flags({this.nsfw, this.racist, this.sexist, this.religious, this.political});
   final bool nsfw;
