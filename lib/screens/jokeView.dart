@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:http/http.dart' as http;
 
 class JokeView extends StatefulWidget {
@@ -9,10 +10,11 @@ class JokeView extends StatefulWidget {
 }
 
 class _JokeViewState extends State<JokeView> {
+  bool autoPlay=true;
   List<Joke> respList = [];
   double i = 0;
-  TextStyle textStyle = TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 20.0);
-  Future<List> fetchJoke() async{
+  TextStyle textStyle = TextStyle(color: Colors.amber[900], fontWeight: FontWeight.bold, fontSize: 20.0);
+  Future fetchJoke() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String categs = prefs.getString('categs');
     String filts = prefs.getString('filters');
@@ -20,10 +22,9 @@ class _JokeViewState extends State<JokeView> {
     for (int i=0; i<=5; i++) {
       final response= await http.get('https://sv443.net/jokeapi/v2/joke/$categs$filts');
       responseObj = Joke.fromJson(json.decode(response.body));
-      respList.add(responseObj);
+      setState(()=>respList.add(responseObj));
       print(responseObj);
     }
-    return respList;
   }
 
   getFlagTags(bool showTag, String title){
@@ -47,6 +48,15 @@ class _JokeViewState extends State<JokeView> {
     }
   }
 
+  playPause(){
+    if(autoPlay){
+      return Icon(Icons.pause, color: Colors.blue, size: 35,);
+    }
+    else{
+      return Icon(Icons.play_arrow, color: Colors.blue, size: 35);
+    }
+  }
+
   void initState(){
     super.initState();
     fetchJoke();
@@ -54,76 +64,117 @@ class _JokeViewState extends State<JokeView> {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Stack(
-        children: jokes.toList(),
+      child: Column(
+        children: [
+          Swiper(
+            itemCount: respList.length,
+            itemBuilder: (context, index) {
+              return jokes.toList()[index];
+            },
+            autoplay: autoPlay,
+            autoplayDelay: 5000,
+            scrollDirection: Axis.horizontal,
+            itemWidth: 270,
+            itemHeight: 350,
+            fade: 50.0,
+            index: 1,
+            loop: true,
+            layout: SwiperLayout.STACK,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              FlatButton(
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                child: AnimatedSwitcher(duration: Duration(milliseconds: 800), child: playPause(),),
+                onPressed: (){
+                  if(autoPlay){
+                    setState(() {
+                      autoPlay=false;
+                    });
+                  }
+                  else setState(() {
+                    autoPlay=true;
+                  });
+                },
+              )
+            ]
+          )
+        ],
       ),
     );
   }
   Iterable<Widget> get jokes sync*{
-    for(var u in respList){
+    for(var jokeObj in respList){
       yield Container(
-      width: 250,
-      height: 300,
-      //padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(color: Colors.black38,
-            blurRadius: 1.0, // soften the shadow
-            spreadRadius: 0.0, //extend the shadow
-            offset: Offset(3.0, 0),
-          )
-        ],
-        color: Color.fromRGBO(0, 60, 110, 1.0),
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      child: Column( 
-        mainAxisAlignment:MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisAlignment:MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(u.category+' #${u.id}', style: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w600, fontSize: 20, color: Colors.white),),
-                u.type=='single'? Padding(
-                  padding: const EdgeInsets.only(top:50.0),
-                  child: Text(u.joke, style: textStyle,),
-                ):Padding(
-                  padding: const EdgeInsets.only(top: 50), 
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(u.setup, style: textStyle),
-                      Padding(padding: const EdgeInsets.only(top:10)),
-                      Text(u.delivery, style: textStyle,),
-                    ]
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Align(
-              alignment: Alignment.bottomLeft,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(color: Colors.black38,
+              blurRadius: 1.0, 
+              spreadRadius: 0.0, 
+              offset: Offset(-3.0, 0),
+            )
+          ],
+          color: Color.fromRGBO(0, 60, 110, 1.0),
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: Column( 
+          mainAxisAlignment:MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisAlignment:MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  getFlagTags(u.flags.nsfw, 'NSFW'),
-                  getFlagTags(u.flags.religious, 'Religious'),
-                  getFlagTags(u.flags.political, 'Political'),
-                  getFlagTags(u.flags.racist, 'Racist'),
-                  getFlagTags(u.flags.sexist, 'Sexist'),
+                  Text(jokeObj.category+' #${jokeObj.id}', style: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w600, fontSize: 20, color: Colors.white),),
+                  jokeObj.type=='single'? Padding(
+                    padding: const EdgeInsets.only(top:50.0),
+                    child: Text(jokeObj.joke, style: textStyle,),
+                  ):Padding(
+                    padding: const EdgeInsets.only(top: 50), 
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(jokeObj.setup, style: textStyle),
+                        Padding(padding: const EdgeInsets.only(top:10)),
+                        Text(jokeObj.delivery, style: textStyle,),
+                      ]
+                    ),
+                  ),
                 ],
               ),
             ),
-          )
-        ],
-      ),
-        );
-      i+=5;
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        getFlagTags(jokeObj.flags.nsfw, 'NSFW'),
+                        getFlagTags(jokeObj.flags.religious, 'Religious'),
+                        getFlagTags(jokeObj.flags.political, 'Political'),
+                        getFlagTags(jokeObj.flags.racist, 'Racist'),
+                        getFlagTags(jokeObj.flags.sexist, 'Sexist'),
+                      ],
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: Opacity(opacity: 0.35, child: Text('JokesApp', style: TextStyle(fontSize: 20, color: Color.fromRGBO(7, 27, 55, 1.0), fontWeight: FontWeight.bold),),)
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
     }
   }
 }
@@ -146,7 +197,7 @@ class Flags{
   }
 }
 class Joke{
-  Joke({this.category, this.type, this.joke, this.setup, this.delivery, this.id, this.flags});
+  Joke({this.category, this.type, this.joke, this.setup, this.delivery, this.id, this.flags, this.error});
   final String category;
   final String type;
   final String joke;
@@ -154,6 +205,7 @@ class Joke{
   final String delivery;
   final int id;
   Flags flags;
+  final bool error;
   factory Joke.fromJson(Map<dynamic, dynamic> json){
     return Joke(
       category: json["category"],
@@ -163,6 +215,7 @@ class Joke{
       setup: json["setup"],
       delivery: json["delivery"],
       flags : Flags.fromJson(json["flags"]),
+      error: json["error"],
     );
   }
 }
