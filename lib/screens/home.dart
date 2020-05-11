@@ -1,3 +1,4 @@
+import 'package:darkjokes/screens/choosePref.dart';
 import 'package:flutter/material.dart';
 import 'package:darkjokes/services/prefs.dart';
 import 'package:darkjokes/screens/jokeView.dart';
@@ -24,16 +25,18 @@ class _HomeState extends State<Home> {
             children: [
               SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(child: Text('Home', style: TextStyle(fontFamily:'Montserrat', fontSize:50, fontWeight: FontWeight.w600, color: Color(0xfff0099FF)),)),
+                      Container(child: Text('Home', style: TextStyle(fontFamily:'Montserrat', fontSize:50, fontWeight: FontWeight.w600, color: Colors.orange[900]),)),
                       IconButton(
                           icon: Icon(Icons.tune),
-                          color: Colors.blue,
+                          color: Colors.orangeAccent[700],
                           iconSize: 28,
-                          onPressed: () => print('Hi'),
+                          onPressed: () {
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context)=> ChoosePrefs(),));
+                          },
                         ),
                     ],
                   ),
@@ -53,6 +56,7 @@ class _HomeState extends State<Home> {
                   child: JokeView(),
                 ),
               ),
+            
             ],
           ),
       ),
