@@ -65,12 +65,6 @@ class _HomeState extends State<Home> {
                 ),
               ),
               Center(child: Text('Tip: If you feel the joke is \nincomplete, try scrolling on the joke!', style: TextStyle(color: Colors.blueAccent))),
-              Container(
-                child: DraggableScrollableSheet(
-                  builder: (context, controller){
-                    return ;
-                  }
-                )
               )
             ],
           ),
