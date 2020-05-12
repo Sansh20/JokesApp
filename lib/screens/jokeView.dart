@@ -12,6 +12,7 @@ class JokeView extends StatefulWidget {
 class _JokeViewState extends State<JokeView> {
   bool autoPlay=true;
   bool formExp=false;
+  bool check = false;
   List<Joke> respList = [];
   double i = 0;
   TextStyle textStyle = TextStyle(color: Colors.amber[900], fontWeight: FontWeight.bold, fontSize: 20.0);
@@ -30,9 +31,13 @@ class _JokeViewState extends State<JokeView> {
           formExp=true;
           print('FormatException Detected');
         }
+        if(formExp==false){
+          responseObj = Joke.fromJson(json.decode(response.body));
+        }
         setState(()=>respList.add(responseObj));
       }
       else{
+        check = true;
         throw Exception('Failed To Load Joke');
       }
       print(responseObj);
@@ -148,7 +153,7 @@ class _JokeViewState extends State<JokeView> {
         ],
       ),
     );}
-    else if(formExp){
+    else if(formExp || check){
       return Tooltip(
         message: 'Reload',
         child: Column(
@@ -213,15 +218,21 @@ class _JokeViewState extends State<JokeView> {
                     padding: const EdgeInsets.only(top:50.0),
                     child: Text(jokeObj.joke, style: textStyle,),
                   ):Padding(
-                    padding: const EdgeInsets.only(top: 50), 
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(jokeObj.setup, style: textStyle),
-                        Padding(padding: const EdgeInsets.only(top:10)),
-                        Text(jokeObj.delivery, style: textStyle,),
-                      ]
+                    padding: const EdgeInsets.only(top: 40), 
+                    child: Container(
+                      height: 220,
+                      
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(jokeObj.setup, style: textStyle),
+                            Padding(padding: const EdgeInsets.only(top:10)),
+                            Text(jokeObj.delivery, style: textStyle,),
+                          ]
+                        ),
+                      ),
                     ),
                   ),
                 ],

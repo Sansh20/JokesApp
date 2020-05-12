@@ -9,16 +9,19 @@ class Preferences{
     return FutureBuilder(
       future: checkPrefs(),
       builder: (BuildContext context, snapshot){
-        if(snapshot.data){
-          return WillPopScope(
-            onWillPop: () async => false,
-            child: Home(),
-          );
+        if(snapshot.hasData){
+          if(snapshot.data){
+            return WillPopScope(
+              onWillPop: () async => false,
+              child: Home(),
+            );
+          }
+          else{
+            return ChoosePrefs();
+          }
         }
-        else{
-          return ChoosePrefs();
-        }
-      },
+        else return Text('Loading');
+      } 
     );
   }
 
