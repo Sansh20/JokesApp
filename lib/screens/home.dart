@@ -60,10 +60,18 @@ class _HomeState extends State<Home> {
               Center(
                 child: Container(
                   width: screenSize.width,
-                  height: 500,
+                  height: 400,
                   child: JokeView(),
                 ),
               ),
+              Center(child: Text('Tip: If you feel the joke is \nincomplete, try scrolling on the joke!', style: TextStyle(color: Colors.blueAccent))),
+              Container(
+                child: DraggableScrollableSheet(
+                  builder: (context, controller){
+                    return ;
+                  }
+                )
+              )
             ],
           ),
       ),
