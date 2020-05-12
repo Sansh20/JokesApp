@@ -1,14 +1,14 @@
 import 'services/prefs.dart';
 import 'package:flutter/material.dart';
 
-void main() => runApp(Home());
+void main() => runApp(Main());
 
-class Home extends StatefulWidget {
+class Main extends StatefulWidget {
   @override
-  _HomeState createState() => _HomeState();
+  _MainState createState() => _MainState();
 }
 
-class _HomeState extends State<Home> {
+class _MainState extends State<Main> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
