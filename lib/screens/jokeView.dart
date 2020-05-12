@@ -11,18 +11,30 @@ class JokeView extends StatefulWidget {
 
 class _JokeViewState extends State<JokeView> {
   bool autoPlay=true;
+  bool formExp=false;
   List<Joke> respList = [];
   double i = 0;
   TextStyle textStyle = TextStyle(color: Colors.amber[900], fontWeight: FontWeight.bold, fontSize: 20.0);
+  TextStyle loadStyle = TextStyle(color: Colors.blue, fontSize: 12);
   Future fetchJoke() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    formExp=false;
     String categs = prefs.getString('categs');
     String filts = prefs.getString('filters');
     var responseObj;
-    for (int i=0; i<=5; i++) {
+    for (setState(()=>i=0); i<=5; setState(()=> i++)) {
       final response= await http.get('https://sv443.net/jokeapi/v2/joke/$categs$filts');
-      responseObj = Joke.fromJson(json.decode(response.body));
-      setState(()=>respList.add(responseObj));
+      if (response.statusCode==200) {
+        try{responseObj = Joke.fromJson(json.decode(response.body));}
+        on FormatException{
+          formExp=true;
+          print('FormatException Detected');
+        }
+        setState(()=>respList.add(responseObj));
+      }
+      else{
+        throw Exception('Failed To Load Joke');
+      }
       print(responseObj);
     }
   }
@@ -50,10 +62,24 @@ class _JokeViewState extends State<JokeView> {
 
   playPause(){
     if(autoPlay){
-      return Icon(Icons.pause, color: Colors.blue, size: 35,);
+      return Tooltip(
+        message: 'Pause',
+        decoration: BoxDecoration(
+          color: Colors.blue,
+          borderRadius: BorderRadius.circular(15.0)
+        ),
+        waitDuration: Duration(milliseconds: 200),
+        child: Icon(Icons.pause, color: Colors.blue, size: 35,));
     }
     else{
-      return Icon(Icons.play_arrow, color: Colors.blue, size: 35);
+      return Tooltip(
+        message: 'Play',
+        decoration: BoxDecoration(
+          color: Colors.blue,
+          borderRadius: BorderRadius.circular(15.0)
+        ),
+        waitDuration: Duration(milliseconds: 200),
+        child: Icon(Icons.play_arrow, color: Colors.blue, size: 35,));
     }
   }
 
@@ -63,7 +89,8 @@ class _JokeViewState extends State<JokeView> {
   }
   @override
   Widget build(BuildContext context) {
-    return Center(
+    if(i>=6 && formExp==false){
+      return Center(
       child: Column(
         children: [
           Swiper(
@@ -78,16 +105,16 @@ class _JokeViewState extends State<JokeView> {
             itemHeight: 350,
             fade: 50.0,
             index: 1,
-            loop: true,
+            loop: false,
             layout: SwiperLayout.STACK,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              FlatButton(
+              IconButton(
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
-                child: AnimatedSwitcher(duration: Duration(milliseconds: 800), child: playPause(),),
+                icon: AnimatedSwitcher(duration: Duration(milliseconds: 800), child: playPause(),),
                 onPressed: (){
                   if(autoPlay){
                     setState(() {
@@ -98,15 +125,67 @@ class _JokeViewState extends State<JokeView> {
                     autoPlay=true;
                   });
                 },
+              ),
+              Tooltip(
+                message: 'Reload',
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  borderRadius: BorderRadius.circular(15.0)
+                ),
+                waitDuration: Duration(milliseconds: 200),
+                child: IconButton(
+                  icon: Icon(Icons.refresh),
+                  color: Colors.blue,
+                  iconSize: 28,
+                  onPressed: (){ 
+                    fetchJoke();
+                    respList.clear();
+                  }
+                ),
               )
             ]
           )
         ],
       ),
+    );}
+    else if(formExp){
+      return Tooltip(
+        message: 'Reload',
+        child: Column(
+          children: [
+            IconButton(
+              icon: Icon(Icons.refresh, color: Colors.blue,),
+              iconSize: 40,
+              color: Colors.blue,
+              onPressed: (){ 
+                fetchJoke();
+                respList.clear();
+              }
+            ),
+            Text('The app has encountered a problem. Please press the Reload', style: loadStyle),
+          ],
+        ),
+      );
+    } 
+    else return Center(
+      child: Container(
+        height: 100,
+        width: 90,
+        child: Column(
+          children: [
+            CircularProgressIndicator(
+              backgroundColor: Colors.amber,
+            ),
+            Padding(padding: const EdgeInsets.only(top: 20)),
+            Text('Loading...', style: loadStyle,),
+          ],
+        ),
+      ),
     );
   }
   Iterable<Widget> get jokes sync*{
     for(var jokeObj in respList){
+      if(jokeObj.error==false)
       yield Container(
         decoration: BoxDecoration(
           boxShadow: [
