@@ -30,14 +30,22 @@ class _HomeState extends State<Home> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(child: Text('Home', style: TextStyle(fontFamily:'Montserrat', fontSize:50, fontWeight: FontWeight.w600, color: Colors.orange[900]),)),
-                      IconButton(
-                          icon: Icon(Icons.tune),
-                          color: Colors.orangeAccent[700],
-                          iconSize: 28,
-                          onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context)=> ChoosePrefs(),));
-                          },
+                      Tooltip(
+                        message: 'Change Preferences',
+                        decoration: BoxDecoration(
+                          color: Colors.blue,
+                          borderRadius: BorderRadius.circular(15.0)
                         ),
+                        waitDuration: Duration(milliseconds: 200),
+                        child: IconButton(
+                            icon: Icon(Icons.tune),
+                            color: Colors.orangeAccent[700],
+                            iconSize: 28,
+                            onPressed: () {
+                              Navigator.of(context).push(MaterialPageRoute(builder: (context)=> ChoosePrefs(),));
+                            },
+                          ),
+                      ),
                     ],
                   ),
                 ),
@@ -52,11 +60,10 @@ class _HomeState extends State<Home> {
               Center(
                 child: Container(
                   width: screenSize.width,
-                  height: 400,
+                  height: 500,
                   child: JokeView(),
                 ),
               ),
-            
             ],
           ),
       ),
