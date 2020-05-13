@@ -17,9 +17,8 @@ class _JokeViewState extends State<JokeView> {
   double i = 0;
   TextStyle textStyle = TextStyle(color: Colors.amber[900], fontWeight: FontWeight.bold, fontSize: 20.0);
   TextStyle loadStyle = TextStyle(color: Colors.blue, fontSize: 12);
-  Future fetchJoke() async{
+  Future<void> fetchJoke() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    formExp=false;
     String categs = prefs.getString('categs');
     String filts = prefs.getString('filters');
     var responseObj;
@@ -93,9 +92,8 @@ class _JokeViewState extends State<JokeView> {
     fetchJoke();
   }
   @override
-  Widget build(BuildContext context) {
-    if(i>=6 && formExp==false){
-      return Center(
+  Widget build(BuildContext context) {    
+    if(i==6 && formExp==false) return Center(
       child: Column(
         children: [
           Swiper(
@@ -128,7 +126,7 @@ class _JokeViewState extends State<JokeView> {
                   }
                   else setState(() {
                     autoPlay=true;
-                  });
+                    });
                 },
               ),
               Tooltip(
@@ -152,7 +150,7 @@ class _JokeViewState extends State<JokeView> {
           )
         ],
       ),
-    );}
+    );
     else if(formExp || check){
       return Tooltip(
         message: 'Reload',
@@ -183,9 +181,10 @@ class _JokeViewState extends State<JokeView> {
             ),
             Padding(padding: const EdgeInsets.only(top: 20)),
             Text('Loading...', style: loadStyle,),
+            Text('$i')
           ],
         ),
-      ),
+      )
     );
   }
   Iterable<Widget> get jokes sync*{
