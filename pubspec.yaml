@@ -23,6 +23,8 @@ environment:
 dependencies:
   shared_preferences: ^0.5.7
   flutter_swiper: ^1.1.6
+  material_design_icons_flutter: ^4.0.5145
+  url_launcher: ^5.4.7
   http: ^0.12.1
   flutter:
     sdk: flutter
@@ -64,6 +66,17 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
+     - family: Varela
+       fonts:
+         - asset: assets/fonts/Varela_Round/VarelaRound-Regular.ttf
+     - family: Oxygen
+       fonts: 
+         - asset: assets/fonts/Oxygen/Oxygen-Light.ttf
+           weight: 100
+         - asset: assets/fonts/Oxygen/Oxygen-Regular.ttf
+           weight: 300
+         - asset: assets/fonts/Oxygen/Oxygen-Bold.ttf
+           weight: 600
      - family: Montserrat
        fonts:
          - asset: assets/fonts/Montserrat/Montserrat-Regular.ttf
