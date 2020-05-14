@@ -246,7 +246,7 @@ class _ChoosePrefsState extends State<ChoosePrefs> {
                   child: Stack(
                     alignment: Alignment(0.85, -0.75),
                     children: [
-                      Image.asset('assets/vectors/waves.png'),
+                      Container(child: Image.asset('assets/vectors/waves.png', fit: BoxFit.cover,)),
                       FloatingActionButton(
                         child: Icon(Icons.arrow_forward_ios),
                         onPressed: () {
