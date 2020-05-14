@@ -30,7 +30,7 @@ class _JokeViewState extends State<JokeView> {
           formExp=true;
           print('FormatException Detected');
         }
-        if(formExp==false){
+        if(!formExp){
           responseObj = Joke.fromJson(json.decode(response.body));
         }
         setState(()=>respList.add(responseObj));
@@ -181,7 +181,6 @@ class _JokeViewState extends State<JokeView> {
             ),
             Padding(padding: const EdgeInsets.only(top: 20)),
             Text('Loading...', style: loadStyle,),
-            Text('$i')
           ],
         ),
       )
@@ -214,22 +213,23 @@ class _JokeViewState extends State<JokeView> {
                 children: [
                   Text(jokeObj.category+' #${jokeObj.id}', style: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w600, fontSize: 20, color: Colors.white),),
                   jokeObj.type=='single'? Padding(
-                    padding: const EdgeInsets.only(top:50.0),
-                    child: Text(jokeObj.joke, style: textStyle,),
+                    padding: const EdgeInsets.only(top:40.0),
+                    child: Container(height: 220,child: SingleChildScrollView(child: Text(jokeObj.joke, style: textStyle,))),
                   ):Padding(
                     padding: const EdgeInsets.only(top: 40), 
                     child: Container(
                       height: 220,
-                      
                       child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(jokeObj.setup, style: textStyle),
-                            Padding(padding: const EdgeInsets.only(top:10)),
-                            Text(jokeObj.delivery, style: textStyle,),
-                          ]
+                        child: Container(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(jokeObj.setup, style: textStyle),
+                              Padding(padding: const EdgeInsets.only(top:10)),
+                              Text(jokeObj.delivery, style: textStyle,),
+                            ]
+                          ),
                         ),
                       ),
                     ),
