@@ -20,7 +20,7 @@ class Preferences{
             return ChoosePrefs();
           }
         }
-        else return Text('Loading');
+        else return Text('Loading...');
       } 
     );
   }
