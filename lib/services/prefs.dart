@@ -20,11 +20,10 @@ class Preferences{
             return ChoosePrefs();
           }
         }
-        else return Text('Loading...');
+        else return Scaffold(body: Center(child: Text('Loading...')));
       } 
     );
   }
-
   checkPrefs() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String categs = prefs.getString('categs');
