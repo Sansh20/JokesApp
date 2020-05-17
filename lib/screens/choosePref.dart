@@ -171,10 +171,6 @@ class _ChoosePrefsState extends State<ChoosePrefs> {
                       ],
                     ),
                     Padding(padding: const EdgeInsets.only(top:3)),
-                    /*Divider(
-                      endIndent: 20.0,
-                      color: Colors.black,
-                      )*/
                     AnimatedOpacity(
                       duration: Duration(milliseconds: 500),
                       opacity: _visible? 1.0:0.0,
@@ -302,7 +298,8 @@ class _ChoosePrefsState extends State<ChoosePrefs> {
                           }
                         }
                       ),  
-             ]),
+                    ]
+                  ),
                 ),
               )
             ],
